@@ -124,51 +124,81 @@ abstract class Piece{
       Piece s = adj.get("s");
       Piece e = adj.get("e");
       Piece w = adj.get("w");
-      if(n!=null){
+      if(n!=null&&n.isBlack()!=this.isBlack()){
          HashSet<Piece> set = new HashSet<Piece>();
-         checkFill(set, n, !this.isBlack());
+         set.add(n);
+         checkFill(set, !this.isBlack());
          connected.addAll(set);
       }
-      if(s!=null){
+      if(s!=null&&s.isBlack()!=this.isBlack()){
           HashSet<Piece> set = new HashSet<Piece>();
-          checkFill(set, s, !this.isBlack());
+          set.add(s);
+          checkFill(set, !this.isBlack());
           connected.addAll(set);
       }
-      if(w!=null){
+      if(w!=null&&w.isBlack()!=this.isBlack()){
           HashSet<Piece> set = new HashSet<Piece>();
-          checkFill(set, w, !this.isBlack());      
+          set.add(w);
+          checkFill(set, !this.isBlack());      
          connected.addAll(set); 
       }
-      if(e!=null){
+      if(e!=null&&e.isBlack()!=this.isBlack()){
          HashSet<Piece> set = new HashSet<Piece>();
-         checkFill(set, e, !this.isBlack());
+         set.add(e);
+         checkFill(set, !this.isBlack());
          connected.addAll(set);
       }
   
      return connected;
   }
-    void checkFill(HashSet <Piece> seen, Piece p, boolean isBlack){
-      if(p==null){
-        seen.clear();
-        return;
+    void checkFill(HashSet <Piece> seen, boolean isBlack){
+      HashSet<Piece> fin = new HashSet<Piece>(seen);
+      boolean notAllFound = true;
+   while(notAllFound){
+      notAllFound = false;
+      Iterator itr = seen.iterator();
+      while(itr.hasNext()){
+        Object temp = itr.next();
+        Piece p = (Piece)temp;
+        int x = p.x;
+        int y = p.y;
+        Piece n = mapPieces.get(x+"|"+(y-wid));
+        Piece s = mapPieces.get(x+"|"+(y+wid));
+        Piece e = mapPieces.get((x+wid)+"|"+y);
+        Piece w = mapPieces.get((x-wid)+"|"+y);
+        if(n!=null&&n.isBlack()==isBlack&&!fin.contains(n)){
+          notAllFound = true;
+          fin.add(n);
+        }
+        if(s!=null&&s.isBlack()==isBlack&&!fin.contains(s)){
+          notAllFound = true;
+          fin.add(s);
+        }
+        if(e!=null&&e.isBlack()==isBlack&&!fin.contains(e)){
+          notAllFound = true;
+          fin.add(e);
+        }
+        if(w!=null&&w.isBlack()==isBlack&&!fin.contains(w)){
+          notAllFound = true;
+          fin.add(w);
+        }        
       }
-      int x = p.x;
-      int y = p.y;
-      Piece n = mapPieces.get(x+"|"+(y-wid));
-      Piece s = mapPieces.get(x+"|"+(y+wid));
-      Piece e = mapPieces.get((x+wid)+"|"+y);
-      Piece w = mapPieces.get((x-wid)+"|"+y);
-      if(p.isBlack()==isBlack){
-         if(!seen.contains(p)){
-             seen.add(p);
-             checkFill(seen, n, isBlack);
-             checkFill(seen, s, isBlack);
-             checkFill(seen, e, isBlack);
-             checkFill(seen, w, isBlack);
-         }
-      }
-      else{
-        return;
+      seen.addAll(fin);
+   }
+    Iterator itr = seen.iterator();
+      while(itr.hasNext()){
+         Object temp = itr.next();
+        Piece p = (Piece)temp;
+        int x = p.x;
+        int y = p.y;
+        Piece n = mapPieces.get(x+"|"+(y-wid));
+        Piece s = mapPieces.get(x+"|"+(y+wid));
+        Piece e = mapPieces.get((x+wid)+"|"+y);
+        Piece w = mapPieces.get((x-wid)+"|"+y);
+        if(n==null||s==null||e==null||w==null){
+           seen.clear();
+           return;
+        }
       }
   }
   
